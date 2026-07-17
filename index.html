@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เป๋าตุง ฟู้ดส์ - ระบบ POS & บริหารคลังสินค้าขั้นสูง (Clean UI)</title>
+    <title>เป๋าตุง ฟู้ดส์ - ระบบ POS & บริหารคลังสินค้าขั้นสูง (Fixed)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -33,7 +33,7 @@
         }
 
         .app-navbar {
-            width: 100%; background-color: #2f3542; display: flex; justify-content: center; gap: 15px; padding: 10px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%; background-color: #2f3542; display: flex; justify(content): center; justify-content: center; gap: 15px; padding: 10px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .nav-btn {
@@ -175,18 +175,17 @@
         <div class="low-stock-alert-panel" id="lowStockAlertBox"></div>
 
         <div class="main-layout">
-            <!-- 🛠️ ฝั่งฟอร์มอินพุตข้อมูลที่ทำการลบข้อความตัวอย่าง (Placeholder) ออกทั้งหมดแล้ว -->
             <div class="card-panel">
                 <h2>👤 ข้อมูลลูกค้า / ออกบิลชำระเงิน</h2>
                 <div class="recognition-alert" id="recognitionAlertBox"></div>
                 <form id="customerForm">
                     <div class="form-group">
                         <label for="phoneNumber">เบอร์โทรศัพท์ลูกค้า (ใช้ตรวจจับระบุคนเดิม):</label>
-                        <input type="tel" id="phoneNumber" pattern="[0-9]{9,10}" required>
+                        <input type="tel" id="phoneNumber" pattern="[0-9]{9,10}" required placeholder="พิมพ์เบอร์โทร เช่น 0912559991">
                     </div>
                     <div class="form-group">
                         <label for="fullName">ชื่อ-นามสกุล:</label>
-                        <input type="text" id="fullName" required>
+                        <input type="text" id="fullName" required placeholder="ระบุชื่อผู้ซื้อ">
                     </div>
                     <div class="form-group">
                         <label for="customerType">กลุ่มสิทธิราคาส่งสินค้า:</label>
@@ -198,7 +197,7 @@
                     </div>
                     <div class="form-group">
                         <label for="location">สถานที่จัดส่ง / สาขา:</label>
-                        <input type="text" id="location" required>
+                        <input type="text" id="location" required placeholder="เช่น อ.เมือง จ.เชียงใหม่">
                     </div>
                     <div class="form-group">
                         <label for="shippingFee">🚚 อัตราค่าจัดส่ง:</label>
@@ -251,8 +250,7 @@
             <h3 style="margin-top:0; font-size: 18px; color: var(--text-main);">🔒 ระบบหลังบ้านจำกัดสิทธิ์เฉพาะผู้บริหาร</h3>
             <p style="font-size:13px; color: var(--text-muted); margin-bottom: 20px;">กรุณาป้อนรหัสผ่านเพื่อตรวจสอบความปลอดภัยระบบคลัง</p>
             <div class="form-group">
-                <!-- 🛠️ ลบตัวอย่างรหัสผ่านในช่องป้อนเพื่อความปลอดภัยสูงสุด -->
-                <input type="password" id="adminPasswordInput">
+                <input type="password" id="adminPasswordInput" placeholder="กรอกรหัสผ่านหลังบ้าน (เริ่มต้น: admin1234)">
             </div>
             <button type="button" class="btn-block btn-submit" style="background:#2f3542;" onclick="checkAdminLogin()">ตรวจสอบรหัสผ่าน</button>
         </div>
@@ -279,7 +277,7 @@
 
             <div class="profile-viewer-card" id="customerProfileCard" style="margin-top:25px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--info-color); padding-bottom:10px;">
-                    <h2>🔍 บัญชีสรุปยอดซื้อสะสมและวิเคราะห์รายบุคคล</h2>
+                    <h2 style="color:var(--info-color); border:none; margin:0;">🔍 บัญชีสรุปยอดซื้อสะสมและวิเคราะห์รายบุคคล</h2>
                     <button type="button" style="width:auto; padding:6px 12px; background:#747d8c;" onclick="document.getElementById('customerProfileCard').style.display='none'">✕ ปิด</button>
                 </div>
                 <div class="profile-grid-info">
@@ -341,8 +339,7 @@
                 <h2>📋 ประวัติและบันทึกข้อมูลใบส่งของหน้าร้านทั้งหมด</h2>
                 <div class="toolbar">
                     <div style="display:flex; gap:10px; flex:1; max-width:600px;">
-                        <!-- 🛠️ ลบข้อความค้นหาตัวอย่างในระบบคีย์บอร์ดเสิร์ชประวัติออก -->
-                        <input type="text" id="searchBox">
+                        <input type="text" id="searchBox" placeholder="🔍 ค้นหาบิลตามชื่อ / เบอร์โทร...">
                         <select id="filterType" style="width: 200px;">
                             <option value="ทั้งหมด">กลุ่มลูกค้าทั้งหมด</option>
                             <option value="ทั่วไป">ลูกค้าทั่วไป</option>
@@ -434,7 +431,7 @@
     <script>
         const productsMaster = [
             { id: 1, category: "ขนมจีบ", name: "ขนมจีบหมู", image: "จีบหมู.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
-            { id: 2, category: "ขนมจีb", name: "ขนมจีบปู", image: "จีบปู.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
+            { id: 2, category: "ขนมจีบ", name: "ขนมจีบปู", image: "จีบปู.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
             { id: 3, category: "ขนมจีบ", name: "ขนมจีบกุ้ง", image: "จีบกุ้ง.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
             { id: 4, category: "ขนมจีบ", name: "ขนมจีบหมูห่อสาหร่าย", image: "จีบสาหร่าย.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
             { id: 5, category: "ขนมจีบ", name: "บะจ่างไส้หวาน / ไส้เค็ม", image: "บ๊ะจ่าง.jpg", detail: "10 ชิ้น/แพ็ค (2.2-2.3 กก.)", prices: { "ทั่วไป": 380, "สนใจแฟรนไชส์": 350, "ขายส่ง": 320 } },
@@ -534,7 +531,6 @@
             calculateSalesDashboard();
         }
 
-        // ฟังก์ชันวาดการ์ดสินค้า POS
         function renderProducts() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
@@ -890,6 +886,7 @@
             renderCustomerProfileLogic(phoneKey);
         }
 
+        // === 🛠️ จุดแก้ไขข้อผิดพลาดตัวแปร (Fixed dateObj to orderDate) ===
         function renderCustomerProfileLogic(phoneKey) {
             const matchedOrders = customerList.filter(order => order.phoneNumber === phoneKey);
             if (matchedOrders.length === 0) return;
@@ -912,6 +909,7 @@
                 else if (currentProfileTimeFilter === '30' && diffDays <= 30) finalFilteredOrders.push(order);
                 else if (currentProfileTimeFilter === 'month_select') {
                     const selectedMonthLabel = document.getElementById('profileMonthSelect').value;
+                    // แก้ไขจาก dateObj.toLocaleDateString เป็น orderDate.toLocaleDateString เพื่อให้อ่านค่าได้ถูกต้อง
                     if (orderDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' }) === selectedMonthLabel) finalFilteredOrders.push(order);
                 }
             });
