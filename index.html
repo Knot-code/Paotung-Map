@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เป๋าตุง ฟู้ดส์ - ระบบ POS & บริหารคลังสินค้าขั้นสูง (Fixed Assets)</title>
+    <title>เป๋าตุง ฟู้ดส์ - ระบบ POS & บริหารคลังสินค้าขั้นสูง (Clean UI)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -130,6 +130,7 @@
 
         .stock-input { width: 80px; padding: 6px; text-align: center; border: 1px solid #ccc; border-radius: 6px; }
         .btn-update-stock { background-color: #2ed573; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .btn-update-stock:hover { background-color: #21b85c; }
 
         .profile-viewer-card { background: linear-gradient(135deg, #ffffff, #fffdfa); border: 2px dashed var(--info-color); border-radius: 16px; padding: 20px; margin-bottom: 25px; display: none; }
         .profile-grid-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 10px; }
@@ -174,6 +175,7 @@
         <div class="low-stock-alert-panel" id="lowStockAlertBox"></div>
 
         <div class="main-layout">
+            <!-- 🛠️ ฝั่งฟอร์มอินพุตข้อมูลที่ทำการลบข้อความตัวอย่าง (Placeholder) ออกทั้งหมดแล้ว -->
             <div class="card-panel">
                 <h2>👤 ข้อมูลลูกค้า / ออกบิลชำระเงิน</h2>
                 <div class="recognition-alert" id="recognitionAlertBox"></div>
@@ -249,6 +251,7 @@
             <h3 style="margin-top:0; font-size: 18px; color: var(--text-main);">🔒 ระบบหลังบ้านจำกัดสิทธิ์เฉพาะผู้บริหาร</h3>
             <p style="font-size:13px; color: var(--text-muted); margin-bottom: 20px;">กรุณาป้อนรหัสผ่านเพื่อตรวจสอบความปลอดภัยระบบคลัง</p>
             <div class="form-group">
+                <!-- 🛠️ ลบตัวอย่างรหัสผ่านในช่องป้อนเพื่อความปลอดภัยสูงสุด -->
                 <input type="password" id="adminPasswordInput">
             </div>
             <button type="button" class="btn-block btn-submit" style="background:#2f3542;" onclick="checkAdminLogin()">ตรวจสอบรหัสผ่าน</button>
@@ -338,6 +341,7 @@
                 <h2>📋 ประวัติและบันทึกข้อมูลใบส่งของหน้าร้านทั้งหมด</h2>
                 <div class="toolbar">
                     <div style="display:flex; gap:10px; flex:1; max-width:600px;">
+                        <!-- 🛠️ ลบข้อความค้นหาตัวอย่างในระบบคีย์บอร์ดเสิร์ชประวัติออก -->
                         <input type="text" id="searchBox">
                         <select id="filterType" style="width: 200px;">
                             <option value="ทั้งหมด">กลุ่มลูกค้าทั้งหมด</option>
@@ -428,14 +432,13 @@
     </div>
 
     <script>
-        // === 🛠️ จุดแก้ไขที่ 1 & 2: แก้พาธรูปภาพซาลาเปาหมูสับ และแก้หมวดหมู่ขนมจีบปูที่เคยพิมพ์ผิดให้กลับมาแสดงผลสมบูรณ์ ===
         const productsMaster = [
             { id: 1, category: "ขนมจีบ", name: "ขนมจีบหมู", image: "จีบหมู.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
-            { id: 2, category: "ขนมจีบ", name: "ขนมจีบปู", image: "จีบปู.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } }, // แก้ไขจาก "ขนมจีb" เป็น "ขนมจีบ"
+            { id: 2, category: "ขนมจีb", name: "ขนมจีบปู", image: "จีบปู.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
             { id: 3, category: "ขนมจีบ", name: "ขนมจีบกุ้ง", image: "จีบกุ้ง.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
             { id: 4, category: "ขนมจีบ", name: "ขนมจีบหมูห่อสาหร่าย", image: "จีบสาหร่าย.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
             { id: 5, category: "ขนมจีบ", name: "บะจ่างไส้หวาน / ไส้เค็ม", image: "บ๊ะจ่าง.jpg", detail: "10 ชิ้น/แพ็ค (2.2-2.3 กก.)", prices: { "ทั่วไป": 380, "สนใจแฟรนไชส์": 350, "ขายส่ง": 320 } },
-            { id: 6, category: "ซาลาเปา", name: "ซาลาเปา ไส้หมูสับ", image: "หมูสับ.jpg", detail: "6 ชิ้น/แพ็ค (100-105 กรัม)", prices: { "ทั่วไป": 78, "สนใจแฟรนไชส์": 72, "ขายส่ง": 66 } }, // แก้ไขพาธจาก "หมูสับ_2.jpg" เป็น "หมูสับ.jpg"
+            { id: 6, category: "ซาลาเปา", name: "ซาลาเปา ไส้หมูสับ", image: "หมูสับ_2.jpg", detail: "6 ชิ้น/แพ็ค (100-105 กรัม)", prices: { "ทั่วไป": 78, "สนใจแฟรนไชส์": 72, "ขายส่ง": 66 } },
             { id: 7, category: "ซาลาเปา", name: "ซาลาเปา ไส้ถั่วดำ", image: "ถั่วดำ.jpg", detail: "6 ชิ้น/แพ็ค (100-105 กรัม)", prices: { "ทั่วไป": 78, "สนใจแฟรนไชส์": 72, "ขายส่ง": 66 } },
             { id: 8, category: "ซาลาเปา", name: "ซาลาเปา ไส้ครีม", image: "ครีม.jpg", detail: "6 ชิ้น/แพ็ค (100-105 กรัม)", prices: { "ทั่วไป": 78, "สนใจแฟรนไชส์": 72, "ขายส่ง": 66 } },
             { id: 9, category: "ซาลาเปา", name: "ซาลาเปา ไส้มันม่วง", image: "มันม่วง.jpg", detail: "6 ชิ้น/แพ็ค (100-105 กรัม)", prices: { "ทั่วไป": 78, "สนใจแฟรนไชส์": 72, "ขายส่ง": 66 } },
@@ -531,6 +534,7 @@
             calculateSalesDashboard();
         }
 
+        // ฟังก์ชันวาดการ์ดสินค้า POS
         function renderProducts() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
