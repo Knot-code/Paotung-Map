@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เป๋าตุง ฟู้ดส์ - ระบบ POS & บริหารคลังสินค้าขั้นสูง (Fixed)</title>
+    <title>เป๋าตุง ฟู้ดส์ - ระบบ POS 2 ชั้น & ใบเสร็จ PDF อัตโนมัติ</title>
+    <!-- นำเข้าคลังไลบรารีมาตรฐานสำหรับแปลง HTML เป็น PDF บนบราว์เซอร์ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #ff4757, #ff6b81);
@@ -33,7 +33,7 @@
         }
 
         .app-navbar {
-            width: 100%; background-color: #2f3542; display: flex; justify(content): center; justify-content: center; gap: 15px; padding: 10px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%; background-color: #2f3542; display: flex; justify-content: center; gap: 15px; padding: 10px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .nav-btn {
@@ -61,16 +61,8 @@
         }
         input:focus, select:focus { outline: none; border-color: #ff4757; background-color: #fff; box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.1); }
 
-        .low-stock-alert-panel {
-            background-color: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; font-weight: bold; display: none; animation: pulseGlow 1.5s infinite alternate;
-        }
-        @keyframes pulseGlow {
-            from { box-shadow: 0 0 4px rgba(255, 71, 87, 0.2); background-color: #fff5f5; }
-            to { box-shadow: 0 0 12px rgba(255, 71, 87, 0.5); background-color: #fed7d7; }
-        }
-
         .recognition-alert {
-            background-color: #e8f4fd; border: 1px solid #b3e5fc; color: #0288d1; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: bold; margin-bottom: 15px; display: none;
+            background-color: #e8f4fd; border: 1px solid #b3e5fc; color: #0288d1; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: bold; margin-bottom: 15px; display: none; animation: fadeIn 0.3s ease;
         }
 
         .category-tabs, .dashboard-tabs, .filter-time-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
@@ -130,7 +122,6 @@
 
         .stock-input { width: 80px; padding: 6px; text-align: center; border: 1px solid #ccc; border-radius: 6px; }
         .btn-update-stock { background-color: #2ed573; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
-        .btn-update-stock:hover { background-color: #21b85c; }
 
         .profile-viewer-card { background: linear-gradient(135deg, #ffffff, #fffdfa); border: 2px dashed var(--info-color); border-radius: 16px; padding: 20px; margin-bottom: 25px; display: none; }
         .profile-grid-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 10px; }
@@ -138,9 +129,15 @@
         .profile-stat-box span { display: block; font-size: 12px; color: var(--text-muted); }
         .profile-stat-box strong { font-size: 16px; color: var(--text-main); }
 
-        .login-overlay { background-color: var(--card-bg); padding: 35px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08); width: 100%; max-width: 400px; text-align: center; margin: 50px auto; border-top: 8px solid var(--text-main); }
+        /* สไตล์หน้าต่างอินเทอร์เฟซฟอร์มล็อกอินหลังบ้าน (Login Screen Style) */
+        .login-overlay {
+            background-color: var(--card-bg); padding: 35px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08); width: 100%; max-width: 400px; text-align: center; margin: 50px auto; border-top: 8px solid var(--text-main);
+        }
 
-        #receiptPdfTemplate { width: 500px; padding: 30px; background: #ffffff; font-family: 'Segoe UI', Arial, sans-serif; color: #333; line-height: 1.5; display: none; }
+        /* === โครงสร้าง CSS ลับสำหรับจัดองค์ประกอบโครงใบเสร็จรับเงิน PDF === */
+        #receiptPdfTemplate {
+            width: 500px; padding: 30px; background: #ffffff; font-family: 'Segoe UI', Arial, sans-serif; color: #333; line-height: 1.5; display: none;
+        }
         .pdf-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
         .pdf-title { font-size: 22px; font-weight: bold; color: #d32f2f; margin: 0; }
         .pdf-meta { font-size: 12px; color: #555; margin-top: 5px; }
@@ -149,31 +146,18 @@
         .pdf-table th, .pdf-table td { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
         .pdf-table th { background: #f2f2f2; font-weight: bold; }
         .pdf-total-zone { text-align: right; margin-top: 15px; font-size: 14px; font-weight: bold; }
-
-        #thermalPrintSection { display: none; width: 76mm; padding: 2mm; background: #fff; font-family: 'Courier New', Courier, monospace, sans-serif; font-size: 12px; color: #000; }
-        .thermal-center { text-align: center; }
-        .thermal-dashed { border-bottom: 1px dashed #000; margin: 5px 0; }
-        .thermal-row { display: flex; justify-content: space-between; margin: 2px 0; }
-
-        @media print {
-            body * { display: none !important; }
-            #thermalPrintSection, #thermalPrintSection * { display: block !important; }
-            #thermalPrintSection { position: absolute; left: 0; top: 0; width: 76mm !important; }
-            .thermal-row { display: flex !important; }
-        }
     </style>
 </head>
 <body>
 
+    <!-- แถบเมนูหลักสลับหน้าจอ 2 ชั้น -->
     <nav class="app-navbar">
         <button class="nav-btn active" id="navFrontPos" onclick="switchAppLayer('front-pos')">🏪 หน้าจอขายหน้าร้าน (POS)</button>
         <button class="nav-btn" id="navBackoffice" onclick="switchAppLayer('backoffice')">⚙️ หน้าจอระบบหลังบ้าน (Admin)</button>
     </nav>
 
-    <!-- ชั้นที่ 1: ระบบหน้าร้าน -->
+    <!-- ==================== ชั้นที่ 1: ระบบหน้าร้าน (Front POS View) ==================== -->
     <section id="layerFrontPos" class="app-view-section active-view">
-        <div class="low-stock-alert-panel" id="lowStockAlertBox"></div>
-
         <div class="main-layout">
             <div class="card-panel">
                 <h2>👤 ข้อมูลลูกค้า / ออกบิลชำระเงิน</h2>
@@ -181,7 +165,7 @@
                 <form id="customerForm">
                     <div class="form-group">
                         <label for="phoneNumber">เบอร์โทรศัพท์ลูกค้า (ใช้ตรวจจับระบุคนเดิม):</label>
-                        <input type="tel" id="phoneNumber" pattern="[0-9]{9,10}" required placeholder="พิมพ์เบอร์โทร เช่น 0912559991">
+                        <input type="tel" id="phoneNumber" pattern="[0-9]{9,10}" required placeholder="พิมพ์เบอร์โทร เช่น 0812345678">
                     </div>
                     <div class="form-group">
                         <label for="fullName">ชื่อ-นามสกุล:</label>
@@ -213,7 +197,7 @@
                         <label for="orderAmount">ยอดเงินสุทธิบิลนี้ (รวมค่าส่ง):</label>
                         <input type="number" id="orderAmount" readonly value="0" style="background-color: #f1f2f6; font-weight: bold; color: #ff4757; font-size: 20px;">
                     </div>
-                    <button type="submit" class="btn-block btn-submit" id="submitBtn">🔒 ชำระเงิน & ออกบิล (รับ PDF & สลิป)</button>
+                    <button type="submit" class="btn-block btn-submit" id="submitBtn">🔒 ชำระเงิน & ออกบิล (รับ PDF)</button>
                     <button type="button" class="btn-block btn-cancel" id="cancelBtn">ยกเลิกการแก้ไข</button>
                 </form>
             </div>
@@ -244,8 +228,10 @@
         </div>
     </section>
 
-    <!-- ชั้นที่ 2: ระบบบริหารหลังบ้าน -->
+    <!-- ==================== ชั้นที่ 2: ระบบบริหารหลังบ้าน (Backoffice Admin) ==================== -->
     <section id="layerBackoffice" class="app-view-section">
+        
+        <!-- ส่วนป้องกันชั้นที่ 2: ฟอร์มกรอกรหัสผ่านก่อนเข้าใช้งานส่วนแอดมิน (เพิ่มใหม่) -->
         <div id="adminLoginScreen" class="login-overlay">
             <h3 style="margin-top:0; font-size: 18px; color: var(--text-main);">🔒 ระบบหลังบ้านจำกัดสิทธิ์เฉพาะผู้บริหาร</h3>
             <p style="font-size:13px; color: var(--text-muted); margin-bottom: 20px;">กรุณาป้อนรหัสผ่านเพื่อตรวจสอบความปลอดภัยระบบคลัง</p>
@@ -255,27 +241,19 @@
             <button type="button" class="btn-block btn-submit" style="background:#2f3542;" onclick="checkAdminLogin()">ตรวจสอบรหัสผ่าน</button>
         </div>
 
+        <!-- กล่องข้อมูลแกนหลักหลังบ้าน จะถูกซ่อนไว้จนกว่าตัวแปรไอดีล็อกอินสถานะจะเป็น True -->
         <div id="adminContentPanel" style="display: none;">
-            <div class="main-layout" style="grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; width: 100%;">
-                <div class="card-panel" style="margin-bottom:0;">
-                    <h2>📊 แดชบอร์ดวิเคราะห์ยอดขายรวม</h2>
-                    <div class="dashboard-tabs">
-                        <button class="dash-tab-btn active" onclick="switchDashboardMode('day')">📅 รายวัน</button>
-                        <button class="dash-tab-btn" onclick="switchDashboardMode('week')">⏳ รายสัปดาห์</button>
-                        <button class="dash-tab-btn" onclick="switchDashboardMode('month')">🗓️ รายเดือน</button>
-                    </div>
-                    <div class="dash-grid" id="monthlySalesDashboard"></div>
+            <div class="card-panel">
+                <h2>📊 แดชบอร์ดวิเคราะห์ยอดขายรวม</h2>
+                <div class="dashboard-tabs">
+                    <button class="dash-tab-btn active" onclick="switchDashboardMode('day')">📅 รายวัน</button>
+                    <button class="dash-tab-btn" onclick="switchDashboardMode('week')">⏳ รายสัปดาห์</button>
+                    <button class="dash-tab-btn" onclick="switchDashboardMode('month')">🗓️ รายเดือน</button>
                 </div>
-                
-                <div class="card-panel" style="margin-bottom:0; display:flex; flex-direction:column; align-items:center;">
-                    <h2>🎯 สัดส่วนเมนูสินค้าทำยอดขายสูงสุด</h2>
-                    <div style="width: 100%; max-width: 280px; margin-top:10px;">
-                        <canvas id="productSalesPieChart"></canvas>
-                    </div>
-                </div>
+                <div class="dash-grid" id="monthlySalesDashboard"></div>
             </div>
 
-            <div class="profile-viewer-card" id="customerProfileCard" style="margin-top:25px;">
+            <div class="profile-viewer-card" id="customerProfileCard">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--info-color); padding-bottom:10px;">
                     <h2 style="color:var(--info-color); border:none; margin:0;">🔍 บัญชีสรุปยอดซื้อสะสมและวิเคราะห์รายบุคคล</h2>
                     <button type="button" style="width:auto; padding:6px 12px; background:#747d8c;" onclick="document.getElementById('customerProfileCard').style.display='none'">✕ ปิด</button>
@@ -311,7 +289,7 @@
                 </div>
             </div>
 
-            <div class="card-panel" style="border-top: 8px solid var(--primary-color); margin-top:25px;">
+            <div class="card-panel" style="border-top: 8px solid var(--primary-color);">
                 <h2>⚙️ ระบบคลังสินค้าหลักและสถิติสะสมสินค้า</h2>
                 <div class="main-layout" style="grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; width: 100%;">
                     <div>
@@ -347,7 +325,7 @@
                             <option value="ขายส่ง">ชุดราคาพิเศษ</option>
                         </select>
                     </div>
-                    <button type="button" class="btn-export" id="exportCsvBtn">📥 ส่งออกรายงาน Excel ละเอียด (CSV)</button>
+                    <button type="button" class="btn-export" id="exportCsvBtn">📥 ส่งออกรายงาน Excel (CSV)</button>
                 </div>
                 <div style="overflow-x:auto;">
                     <table style="width:100%; border-collapse:collapse; text-align:left;" class="cart-table">
@@ -371,7 +349,7 @@
         </div>
     </section>
 
-    <!-- แม่แบบ PDF -->
+    <!-- ==================== โครงใบเสร็จลับจำลองสำหรับแปลงเป็นไฟล์ PDF ยิงลงเครื่องอัตโนมัติ ==================== -->
     <div id="receiptPdfTemplate">
         <div class="pdf-header">
             <div class="pdf-title">ใบเสร็จรับเงิน / ใบส่งของราคาส่ง</div>
@@ -385,46 +363,22 @@
             <strong>วันที่ทำรายการ:</strong> <span id="pdfOrderDate"></span>
         </div>
         <table class="pdf-table">
-            <thead><tr><th>รายการสินค้าส่ง</th><th>ราคาส่ง/แพ็ค</th><th>จำนวน</th><th>ยอดรวม</th></tr></thead>
+            <thead>
+                <tr>
+                    <th>รายการสินค้าส่ง</th>
+                    <th>ราคาส่ง/แพ็ค</th>
+                    <th>จำนวน</th>
+                    <th>ยอดรวม</th>
+                </tr>
+            </thead>
             <tbody id="pdfTableBody"></tbody>
         </table>
         <div class="pdf-total-zone">
             🚚 อัตราค่าจัดส่งระบบคลัง: <span id="pdfShipFee">0</span> บาท<br>
-            <span style="font-size:14px; color:#d32f2f;">💰 ยอดเงินสุทธิทั้งสิ้น: <span id="pdfGrandTotal">0</span> บาท</span>
+            <span style="font-size:16px; color:#d32f2f;">💰 ยอดเงินสุทธิทั้งสิ้น: <span id="pdfGrandTotal">0</span> บาท</span>
         </div>
-    </div>
-
-    <!-- สลิปความร้อน -->
-    <div id="thermalPrintSection">
-        <div class="thermal-center">
-            <strong style="font-size:14px;">** เป๋าตุง ฟู้ดส์ **</strong><br>
-            ใบส่งของ / สลิปหน้าร้านย่อ<br>
-            Line: @Paotungfood
-        </div>
-        <div class="thermal-dashed"></div>
-        <div>
-            วันที่: <span id="thmDate"></span><br>
-            ผู้ซื้อ: <span id="thmName"></span><br>
-            โทร: <span id="thmPhone"></span>
-        </div>
-        <div class="thermal-dashed"></div>
-        <div style="font-weight:bold;" class="thermal-row">
-            <span>รายการสินค้า</span>
-            <span>ยอดรวม</span>
-        </div>
-        <div id="thermalItemsContainer"></div>
-        <div class="thermal-dashed"></div>
-        <div class="thermal-row">
-            <span>ค่าจัดส่ง:</span>
-            <span><span id="thmShip">0</span> บ.</span>
-        </div>
-        <div style="font-size:13px; font-weight:bold;" class="thermal-row">
-            <span>ยอดรวมสุทธิ:</span>
-            <span><span id="thmTotal">0</span> บ.</span>
-        </div>
-        <div class="thermal-dashed"></div>
-        <div class="thermal-center" style="font-size:11px; margin-top:5px;">
-            ขอบคุณที่ร่วมเป็นพาร์ทเนอร์<br>ขนมจีบซาลาเปาเป๋าตุงค่ะ
+        <div style="margin-top:30px; text-align:center; font-size:11px; color:#666; border-top:1px dashed #ccc; padding-top:10px;">
+            ** ขอบคุณที่อุดหนุนแฟรนไชส์และสินค้าส่ง เป๋าตุง ฟู้ดส์ ค่ะ **
         </div>
     </div>
 
@@ -458,8 +412,9 @@
         let currentDashboardMode = 'day';
         let selectedProfilePhone = null;
         let currentProfileTimeFilter = 'all';
+        
+        // ตัวแปรคุมสถานะความปลอดภัยหลังบ้าน (Authentication State)
         let isAdminLoggedIn = false;
-        let salesPieChartInstance = null;
 
         document.getElementById('phoneNumber').addEventListener('input', handlePhoneAutoRecognition);
         document.getElementById('shippingFee').addEventListener('change', updateCartDisplay);
@@ -469,27 +424,32 @@
 
         renderProducts();
         updateAppDisplay();
-        checkLowStockAlerts();
+        populateProfileMonthDropdown();
 
-        function checkLowStockAlerts() {
-            const alertBox = document.getElementById('lowStockAlertBox');
+        function handlePhoneAutoRecognition() {
+            const typedPhone = document.getElementById('phoneNumber').value.trim();
+            const alertBox = document.getElementById('recognitionAlertBox');
             alertBox.style.display = 'none';
-            alertBox.innerHTML = '';
 
-            let lowStockItems = [];
-            productsMaster.forEach(p => {
-                const stockQty = stockMemory[p.id];
-                if (stockQty <= 5) {
-                    lowStockItems.push(`${p.name} (คงเหลือ ${stockQty} แพ็ค)`);
+            if (typedPhone.length >= 9 && typedPhone.length <= 10) {
+                const matchedHistory = customerList.filter(order => order.phoneNumber === typedPhone);
+                if (matchedHistory.length > 0) {
+                    const latestProfile = matchedHistory[matchedHistory.length - 1];
+                    document.getElementById('fullName').value = latestProfile.fullName;
+                    document.getElementById('location').value = latestProfile.location;
+                    document.getElementById('customerType').value = latestProfile.customerType;
+
+                    let lifetimeSpend = 0;
+                    matchedHistory.forEach(b => lifetimeSpend += b.orderAmount);
+
+                    alertBox.style.display = 'block';
+                    alertBox.innerHTML = `✨ <strong>พบข้อมูลลูกค้าเก่า!</strong> คุณ <strong>${latestProfile.fullName}</strong> | ยอดสั่งซื้อสะสมรวม: <span style="color:#ff4757; font-weight:800;">${lifetimeSpend.toLocaleString()} บาท</span> (รวม ${matchedHistory.length} บิล)`;
+                    renderProducts(); updateCartDisplay();
                 }
-            });
-
-            if (lowStockItems.length > 0) {
-                alertBox.style.display = 'block';
-                alertBox.innerHTML = `⚠️ <strong>[แจ้งเตือนระบบคลังสต็อกใกล้หมด]</strong> มีสินค้าจำนวน ${lowStockItems.length} รายการที่ใกล้หมดคลังกรุณาเติมสต็อก: <br> • ${lowStockItems.join('<br> • ')}`;
             }
         }
 
+        // === 1. ตรรกะระบบความปลอดภัยทางเข้าหลังบ้าน (Admin Auth Control) ===
         function switchAppLayer(layerName) {
             document.getElementById('navFrontPos').classList.remove('active');
             document.getElementById('navBackoffice').classList.remove('active');
@@ -499,19 +459,35 @@
             if (layerName === 'front-pos') {
                 document.getElementById('navFrontPos').classList.add('active');
                 document.getElementById('layerFrontPos').classList.add('active-view');
+                
+                // ออกจากระบบหลังบ้านอัตโนมัติเมื่อกลับไปหน้าหน้าร้านเพื่อความปลอดภัย
                 isAdminLoggedIn = false;
                 document.getElementById('adminPasswordInput').value = "";
                 document.getElementById('adminLoginScreen').style.display = 'block';
                 document.getElementById('adminContentPanel').style.display = 'none';
-                checkLowStockAlerts();
             } else {
                 document.getElementById('navBackoffice').classList.add('active');
                 document.getElementById('layerBackoffice').classList.add('active-view');
+                
+                // ตรวจสอบสถานะว่าเคยเข้าระบบผ่านฟอร์มแล้วหรือยัง
                 if (isAdminLoggedIn) {
                     document.getElementById('adminLoginScreen').style.display = 'none';
                     document.getElementById('adminContentPanel').style.display = 'block';
                     updateAppDisplay();
                 }
+            }
+        }
+
+        function checkAdminLogin() {
+            const inputPass = document.getElementById('adminPasswordInput').value;
+            // ตั้งค่ารหัสผ่านเข้าหลังบ้านตรงส่วนนี้
+            if (inputPass === 'admin1234') {
+                isAdminLoggedIn = true;
+                document.getElementById('adminLoginScreen').style.display = 'none';
+                document.getElementById('adminContentPanel').style.display = 'block';
+                updateAppDisplay();
+            } else {
+                alert("❌ รหัสผ่านหลังบ้านไม่ถูกต้อง! ปฏิเสธการเข้าถึงระบบควบคุมสต็อก");
             }
         }
 
@@ -652,73 +628,60 @@
             
             localStorage.setItem('bakeryCustomers', JSON.stringify(customerList));
 
+            // === สั่งงานระบบพิมพ์ออกใบเสร็จ PDF ส่งลงเครื่องลูกค้ารวมอัตโนมัติ (PDF Engine Call) ===
             generatePDFReceipt(customerData);
-            triggerThermalReceiptPrint(customerData);
 
             cart = [];
             updateCartDisplay();
             resetFormState();
             populateProfileMonthDropdown();
-            checkLowStockAlerts();
         });
 
+        // === 2. ระบบคำนวณและแปลงโครงโครงใบเสร็จ HTML เป็นไฟล์เอกสาร PDF (html2pdf.js Logic) ===
         function generatePDFReceipt(orderData) {
+            // แปะข้อความ Metadata ลงบล็อกใบเสร็จลับ
             document.getElementById('pdfCustName').innerText = orderData.fullName;
             document.getElementById('pdfCustPhone').innerText = orderData.phoneNumber;
             document.getElementById('pdfCustLocation').innerText = orderData.location;
-            document.getElementById('pdfCustType').innerText = orderData.customerType;
+            document.getElementById('pdfCustType').innerText = orderData.customerType === 'สนใจแฟรนไชส์' ? 'สมาชิกแฟรนไชส์เป๋าตุง' : orderData.customerType === 'ขายส่ง' ? 'ชุดราคาพิเศษ' : 'ลูกค้าทั่วไป';
             document.getElementById('pdfOrderDate').innerText = new Date(orderData.lastOrderDateTime).toLocaleString('th-TH');
             document.getElementById('pdfShipFee').innerText = orderData.shippingFee.toLocaleString();
             document.getElementById('pdfGrandTotal').innerText = orderData.orderAmount.toLocaleString();
 
+            // วนลูปแตกสินค้าลงตารางใน PDF
             const tableBody = document.getElementById('pdfTableBody');
             tableBody.innerHTML = '';
+            
+            let itemsTotalSum = 0;
             orderData.cartItems.forEach(item => {
                 const subtotal = item.price * item.quantity;
+                itemsTotalSum += subtotal;
                 const row = document.createElement('tr');
-                row.innerHTML = `<td>${item.name}</td><td>${item.price} บ.</td><td>${item.quantity} แพ็ค</td><td>${subtotal.toLocaleString()} บ.</td>`;
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.price} บ.</td>
+                    <td>${item.quantity} แพ็ค</td>
+                    <td>${subtotal.toLocaleString()} บ.</td>
+                `;
                 tableBody.appendChild(row);
             });
 
+            // ดึงบล็อกใบเสร็จจำลองขึ้นมาประมวลผลแปลงเป็นไฟล์ PDF
             const element = document.getElementById('receiptPdfTemplate');
+            
+            // ตั้งค่าคุณสมบัติความกว้างและความคมชัดของไฟล์ PDF
             const opt = {
-                margin: 10, filename: `ใบเสร็จ_เป๋าตุงฟู้ดส์_${Date.now()}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' }
+                margin:       10,
+                filename:     `ใบเสร็จ_เป๋าตุงฟู้ดส์_บิล_${Date.now()}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true }, // เพิ่มสเกลความคมชัดภาพและอนุญาตภาพจากลิงก์นอก
+                jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' } // กำหนดไซส์ขนาดกะทัดรัด A5 สวยงาม
             };
-            html2pdf().set(opt).from(element).save();
-        }
 
-        function triggerThermalReceiptPrint(orderData) {
-            document.getElementById('thmDate').innerText = new Date(orderData.lastOrderDateTime).toLocaleString('th-TH');
-            document.getElementById('thmName').innerText = orderData.fullName;
-            document.getElementById('thmPhone').innerText = orderData.phoneNumber;
-            document.getElementById('thmShip').innerText = orderData.shippingFee.toLocaleString();
-            document.getElementById('thmTotal').innerText = orderData.orderAmount.toLocaleString();
-
-            const container = document.getElementById('thermalItemsContainer');
-            container.innerHTML = '';
-
-            orderData.cartItems.forEach(item => {
-                const subtotal = item.price * item.quantity;
-                const row = document.createElement('div');
-                row.className = 'thermal-row';
-                row.innerHTML = `<span>${item.name} x${item.quantity}</span><span>${subtotal.toLocaleString()}</span>`;
-                container.appendChild(row);
+            // รันคำสั่งแปลงและส่งไฟล์ดาวน์โหลดลงเครื่องทันที
+            html2pdf().set(opt).from(element).save().then(() => {
+                alert("✨ ประมวลผลสำเร็จ! สต็อกคลังถูกอัปเดตและใบเสร็จ PDF ถูกจัดส่งดาวน์โหลดเรียบร้อยแล้วครับ");
             });
-
-            setTimeout(() => { window.print(); }, 500);
-        }
-
-        function checkAdminLogin() {
-            const inputPass = document.getElementById('adminPasswordInput').value;
-            if (inputPass === 'admin1234') {
-                isAdminLoggedIn = true;
-                document.getElementById('adminLoginScreen').style.display = 'none';
-                document.getElementById('adminContentPanel').style.display = 'block';
-                updateAppDisplay();
-            } else {
-                alert("❌ รหัสผ่านหลังบ้านไม่ถูกต้อง!");
-            }
         }
 
         function voidOrder(index) {
@@ -796,60 +759,6 @@
             body.appendChild(totalRow);
         }
 
-        function updateProductSalesPieChartVisual() {
-            const productSalesCount = {};
-            productsMaster.forEach(p => { productSalesCount[p.name] = 0; });
-
-            customerList.forEach(order => {
-                if (order.cartItems) {
-                    order.cartItems.forEach(item => {
-                        if (productSalesCount[item.name] !== undefined) {
-                            productSalesCount[item.name] += item.quantity;
-                        }
-                    });
-                }
-            });
-
-            const labels = [];
-            const dataValues = [];
-            
-            Object.keys(productSalesCount).forEach(name => {
-                if (productSalesCount[name] > 0) {
-                    labels.push(name);
-                    dataValues.push(productSalesCount[name]);
-                }
-            });
-
-            const ctx = document.getElementById('productSalesPieChart').getContext('2d');
-            
-            if (salesPieChartInstance) {
-                salesPieChartInstance.destroy();
-            }
-
-            if (labels.length === 0) return;
-
-            salesPieChartInstance = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: dataValues,
-                        backgroundColor: [
-                            '#ff4757', '#ff6b81', '#ffa502', '#ff7f50', '#2ed573', 
-                            '#1e90ff', '#70a1ff', '#5352ed', '#3742fa', '#747d8c',
-                            '#a4b0be', '#ced6e0', '#2f3542', '#eccc68', '#ffa801'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
-                    }
-                }
-            });
-        }
-
         function populateProfileMonthDropdown() {
             const dropdown = document.getElementById('profileMonthSelect');
             if(!dropdown) return;
@@ -886,7 +795,6 @@
             renderCustomerProfileLogic(phoneKey);
         }
 
-        // === 🛠️ จุดแก้ไขข้อผิดพลาดตัวแปร (Fixed dateObj to orderDate) ===
         function renderCustomerProfileLogic(phoneKey) {
             const matchedOrders = customerList.filter(order => order.phoneNumber === phoneKey);
             if (matchedOrders.length === 0) return;
@@ -909,7 +817,6 @@
                 else if (currentProfileTimeFilter === '30' && diffDays <= 30) finalFilteredOrders.push(order);
                 else if (currentProfileTimeFilter === 'month_select') {
                     const selectedMonthLabel = document.getElementById('profileMonthSelect').value;
-                    // แก้ไขจาก dateObj.toLocaleDateString เป็น orderDate.toLocaleDateString เพื่อให้อ่านค่าได้ถูกต้อง
                     if (orderDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' }) === selectedMonthLabel) finalFilteredOrders.push(order);
                 }
             });
@@ -981,12 +888,12 @@
         }
 
         function updateAppDisplay() { 
+            // รันเฉพาะเมื่อตัวแปรล็อกอินหลังบ้านปลดล็อกสมบูรณ์แล้วเท่านั้น ป้องกันการดักอ่านข้อมูลทางอ้อม
             if(isAdminLoggedIn) {
                 calculateSalesDashboard(); 
                 updateCustomerTable(); 
                 renderStockManagementTable();
                 renderProductSalesReport();
-                updateProductSalesPieChartVisual();
             }
         }
 
@@ -1069,36 +976,22 @@
 
         document.getElementById('exportCsvBtn').addEventListener('click', function() {
             if (customerList.length === 0) { alert("ไม่มีข้อมูลสำหรับการนำออก"); return; }
-            let csvHeaderArray = ["บิลที่", "ชื่อผู้ซื้อ", "เบอร์โทรศัพท์", "สถานที่จัดส่ง", "ประเภทราคาส่ง", "วันที่บันทึกรายการ"];
-            productsMaster.forEach(p => { csvHeaderArray.push(`"${p.name} (แพ็ค)"`); });
-            csvHeaderArray.push("ค่าจัดส่ง(บาท)", " ยอดเงินสุทธิรวมบิล(บาท)");
-
-            let csvContent = csvHeaderArray.join(",") + "\n";
-
+            let csvContent = "บิลที่,ชื่อผู้ซื้อ,เบอร์โทรศัพท์,สถานที่จัดส่ง,ประเภทราคาส่ง,รายการสินค้าที่ซื้อ,ยอดเงินรวมบิล(บาท)\n";
             customerList.forEach((customer, index) => {
-                const formattedDate = customer.lastOrderDateTime ? new Date(customer.lastOrderDateTime).toLocaleString('th-TH') : '-';
-                let orderRowCells = [index + 1, `"${customer.fullName}"`, `"${customer.phoneNumber}"`, `"${customer.location}"`, `"${customer.customerType}"`, `"${formattedDate}"`];
-
-                productsMaster.forEach(p => {
-                    let quantitySold = 0;
-                    if (customer.cartItems) {
-                        const foundItem = customer.cartItems.find(item => item.name === p.name);
-                        if (foundItem) quantitySold = foundItem.quantity;
-                    }
-                    orderRowCells.push(quantitySold);
-                });
-
-                orderRowCells.push(customer.shippingFee || 0);
-                orderRowCells.push(customer.orderAmount);
-                csvContent += orderRowCells.join(",") + "\n";
+                let itemsText = "";
+                if (customer.cartItems) { customer.cartItems.forEach(i => { itemsText += `${i.name}(${i.quantity}แพ็ค) `; }); }
+                itemsText += `ค่าส่ง:${customer.shippingFee || 0}บ.`;
+                const row = [index + 1, `"${customer.fullName}"`, `"${customer.phoneNumber}"`, `"${customer.location}"`, `"${customer.customerType}"`, `"${itemsText}"`, customer.orderAmount].join(",");
+                csvContent += row + "\n";
             });
-
             const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.setAttribute("href", url);
-            link.setAttribute("download", `รายงานบัญชีราคาส่ง_เป๋าตุงฟู้ดส์_แยกสินค้าละเอียด_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.csv`);
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            link.setAttribute("download", `รายงานสรุปบิลยอดขาย_เป๋าตุงฟู้ดส์_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
     </script>
 </body>
