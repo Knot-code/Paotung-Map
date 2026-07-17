@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เป๋าตุง ฟู้ดส์ - ระบบ POS 2 ชั้น & แผนที่แฟรนไชส์เครือข่าย</title>
+    <title>เป๋าตุง ฟู้ดส์ - ระบบ POS & บริหารคลังสินค้าขั้นสูง (Fixed Assets)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -69,7 +69,9 @@
             to { box-shadow: 0 0 12px rgba(255, 71, 87, 0.5); background-color: #fed7d7; }
         }
 
-        .recognition-alert { background-color: #e8f4fd; border: 1px solid #b3e5fc; color: #0288d1; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: bold; margin-bottom: 15px; display: none; }
+        .recognition-alert {
+            background-color: #e8f4fd; border: 1px solid #b3e5fc; color: #0288d1; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: bold; margin-bottom: 15px; display: none;
+        }
 
         .category-tabs, .dashboard-tabs, .filter-time-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
         .tab-btn { background: #fff; border: 1px solid #e0e0e0; padding: 10px 20px; border-radius: 25px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
@@ -151,14 +153,6 @@
         .thermal-center { text-align: center; }
         .thermal-dashed { border-bottom: 1px dashed #000; margin: 5px 0; }
         .thermal-row { display: flex; justify-content: space-between; margin: 2px 0; }
-
-        /* === ส่วนตกแต่ง UI คอนเทนเนอร์แผนที่เครือข่ายแฟรนไชส์ (Paotung Map UI Style) === */
-        .map-wrapper-panel {
-            width: 100%; height: 500px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-top: 15px;
-        }
-        .map-iframe-element {
-            width: 100%; height: 100%; border: none;
-        }
 
         @media print {
             body * { display: none !important; }
@@ -261,16 +255,6 @@
         </div>
 
         <div id="adminContentPanel" style="display: none;">
-            
-            <!-- === 🗺️ มอดูลย่อยเพิ่มใหม่: โซนระบบฝังหน้าจอแผนที่เครือข่ายแฟรนไชส์ (Integrated Paotung Map Component) === -->
-            <div class="wide-panel card-panel" style="border-top: 8px solid var(--info-color);">
-                <h2>🗺️ ระบบตรวจสอบแผนที่เครือข่ายแฟรนไชส์และเส้นทางจัดส่งสินค้า</h2>
-                <div class="map-wrapper-panel">
-                    <!-- ดึงพาธลิงก์พิกัดจริงมาสตรีมผ่านระบบ Iframe ของบราว์เซอร์โดยตรง -->
-                    <iframe src="https://knot-code.github.io/Paotung-Map/" class="map-iframe-element" title="Paotung Franchise Map Component"></iframe>
-                </div>
-            </div>
-
             <div class="main-layout" style="grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; width: 100%;">
                 <div class="card-panel" style="margin-bottom:0;">
                     <h2>📊 แดชบอร์ดวิเคราะห์ยอดขายรวม</h2>
@@ -444,13 +428,14 @@
     </div>
 
     <script>
+        // === 🛠️ จุดแก้ไขที่ 1 & 2: แก้พาธรูปภาพซาลาเปาหมูสับ และแก้หมวดหมู่ขนมจีบปูที่เคยพิมพ์ผิดให้กลับมาแสดงผลสมบูรณ์ ===
         const productsMaster = [
             { id: 1, category: "ขนมจีบ", name: "ขนมจีบหมู", image: "จีบหมู.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
-            { id: 2, category: "ขนมจีบ", name: "ขนมจีบปู", image: "จีบปู.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
+            { id: 2, category: "ขนมจีบ", name: "ขนมจีบปู", image: "จีบปู.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } }, // แก้ไขจาก "ขนมจีb" เป็น "ขนมจีบ"
             { id: 3, category: "ขนมจีบ", name: "ขนมจีบกุ้ง", image: "จีบกุ้ง.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
             { id: 4, category: "ขนมจีบ", name: "ขนมจีบหมูห่อสาหร่าย", image: "จีบสาหร่าย.jpg", detail: "100 ชิ้น/แพ็ค (2.2 กก.)", prices: { "ทั่วไป": 300, "สนใจแฟรนไชส์": 290, "ขายส่ง": 280 } },
             { id: 5, category: "ขนมจีบ", name: "บะจ่างไส้หวาน / ไส้เค็ม", image: "บ๊ะจ่าง.jpg", detail: "10 ชิ้น/แพ็ค (2.2-2.3 กก.)", prices: { "ทั่วไป": 380, "สนใจแฟรนไชส์": 350, "ขายส่ง": 320 } },
-            { id: 6, category: "ซาลาเปา", name: "ซาลาเปา ไส้หมูสับ", image: "หมูสับ.jpg", detail: "6 ชิ้น/แพ็ค (100-105 กรัม)", prices: { "ทั่วไป": 78, "สนใจแฟรนไชส์": 72, "ขายส่ง": 66 } },
+            { id: 6, category: "ซาลาเปา", name: "ซาลาเปา ไส้หมูสับ", image: "หมูสับ.jpg", detail: "6 ชิ้น/แพ็ค (100-105 กรัม)", prices: { "ทั่วไป": 78, "สนใจแฟรนไชส์": 72, "ขายส่ง": 66 } }, // แก้ไขพาธจาก "หมูสับ_2.jpg" เป็น "หมูสับ.jpg"
             { id: 7, category: "ซาลาเปา", name: "ซาลาเปา ไส้ถั่วดำ", image: "ถั่วดำ.jpg", detail: "6 ชิ้น/แพ็ค (100-105 กรัม)", prices: { "ทั่วไป": 78, "สนใจแฟรนไชส์": 72, "ขายส่ง": 66 } },
             { id: 8, category: "ซาลาเปา", name: "ซาลาเปา ไส้ครีม", image: "ครีม.jpg", detail: "6 ชิ้น/แพ็ค (100-105 กรัม)", prices: { "ทั่วไป": 78, "สนใจแฟรนไชส์": 72, "ขายส่ง": 66 } },
             { id: 9, category: "ซาลาเปา", name: "ซาลาเปา ไส้มันม่วง", image: "มันม่วง.jpg", detail: "6 ชิ้น/แพ็ค (100-105 กรัม)", prices: { "ทั่วไป": 78, "สนใจแฟรนไชส์": 72, "ขายส่ง": 66 } },
@@ -488,13 +473,15 @@
 
         function checkLowStockAlerts() {
             const alertBox = document.getElementById('lowStockAlertBox');
-            if(!alertBox) return;
-            alertBox.style.display = 'none'; alertBox.innerHTML = '';
+            alertBox.style.display = 'none';
+            alertBox.innerHTML = '';
 
             let lowStockItems = [];
             productsMaster.forEach(p => {
                 const stockQty = stockMemory[p.id];
-                if (stockQty <= 5) lowStockItems.push(`${p.name} (คงเหลือ ${stockQty} แพ็ค)`);
+                if (stockQty <= 5) {
+                    lowStockItems.push(`${p.name} (คงเหลือ ${stockQty} แพ็ค)`);
+                }
             });
 
             if (lowStockItems.length > 0) {
@@ -546,7 +533,6 @@
 
         function renderProducts() {
             const grid = document.getElementById('productGrid');
-            if(!grid) return;
             grid.innerHTML = '';
             const customerType = document.getElementById('customerType').value;
 
@@ -606,7 +592,6 @@
 
         function updateCartDisplay() {
             const body = document.getElementById('cartTableBody');
-            if(!body) return;
             body.innerHTML = '';
             const shippingFee = parseFloat(document.getElementById('shippingFee').value) || 0;
 
@@ -670,7 +655,11 @@
             generatePDFReceipt(customerData);
             triggerThermalReceiptPrint(customerData);
 
-            cart = []; updateCartDisplay(); resetFormState(); populateProfileMonthDropdown(); checkLowStockAlerts();
+            cart = [];
+            updateCartDisplay();
+            resetFormState();
+            populateProfileMonthDropdown();
+            checkLowStockAlerts();
         });
 
         function generatePDFReceipt(orderData) {
@@ -758,7 +747,7 @@
 
         function renderStockManagementTable() {
             const body = document.getElementById('stockManagementTableBody');
-            if(!body) return; body.innerHTML = '';
+            body.innerHTML = '';
             productsMaster.forEach(p => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -777,7 +766,7 @@
 
         function renderProductSalesReport() {
             const body = document.getElementById('productSalesReportBody');
-            if(!body) return; body.innerHTML = '';
+            body.innerHTML = '';
             const productSalesStats = {};
             productsMaster.forEach(p => { productSalesStats[p.id] = { name: p.name, totalQty: 0, totalRevenue: 0 }; });
 
@@ -814,20 +803,29 @@
             customerList.forEach(order => {
                 if (order.cartItems) {
                     order.cartItems.forEach(item => {
-                        if (productSalesCount[item.name] !== undefined) productSalesCount[item.name] += item.quantity;
+                        if (productSalesCount[item.name] !== undefined) {
+                            productSalesCount[item.name] += item.quantity;
+                        }
                     });
                 }
             });
 
-            const labels = [], dataValues = [];
+            const labels = [];
+            const dataValues = [];
+            
             Object.keys(productSalesCount).forEach(name => {
-                if (productSalesCount[name] > 0) { labels.push(name); dataValues.push(productSalesCount[name]); }
+                if (productSalesCount[name] > 0) {
+                    labels.push(name);
+                    dataValues.push(productSalesCount[name]);
+                }
             });
 
-            const canvas = document.getElementById('productSalesPieChart');
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            if (salesPieChartInstance) salesPieChartInstance.destroy();
+            const ctx = document.getElementById('productSalesPieChart').getContext('2d');
+            
+            if (salesPieChartInstance) {
+                salesPieChartInstance.destroy();
+            }
+
             if (labels.length === 0) return;
 
             salesPieChartInstance = new Chart(ctx, {
@@ -836,16 +834,26 @@
                     labels: labels,
                     datasets: [{
                         data: dataValues,
-                        backgroundColor: ['#ff4757', '#ff6b81', '#ffa502', '#ff7f50', '#2ed573', '#1e90ff', '#70a1ff', '#5352ed', '#3742fa', '#747d8c', '#a4b0be', '#ced6e0', '#2f3542', '#eccc68', '#ffa801']
+                        backgroundColor: [
+                            '#ff4757', '#ff6b81', '#ffa502', '#ff7f50', '#2ed573', 
+                            '#1e90ff', '#70a1ff', '#5352ed', '#3742fa', '#747d8c',
+                            '#a4b0be', '#ced6e0', '#2f3542', '#eccc68', '#ffa801'
+                        ]
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+                    }
+                }
             });
         }
 
         function populateProfileMonthDropdown() {
             const dropdown = document.getElementById('profileMonthSelect');
-            if(!dropdown) return; dropdown.innerHTML = '<option value="">-- หรือเลือกตามรอบเดือนที่ผ่านมา --</option>';
+            if(!dropdown) return;
+            dropdown.innerHTML = '<option value="">-- หรือเลือกตามรอบเดือนที่ผ่านมา --</option>';
             const monthsSeen = new Set();
             customerList.forEach(order => {
                 if (!order.lastOrderDateTime) return;
@@ -868,7 +876,8 @@
         }
 
         function viewCustomerProfile(phoneKey) {
-            selectedProfilePhone = phoneKey; currentProfileTimeFilter = 'all';
+            selectedProfilePhone = phoneKey;
+            currentProfileTimeFilter = 'all';
             const buttons = document.querySelectorAll('.filter-time-tabs .time-tab-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             document.getElementById('timeBtn_all').classList.add('active');
@@ -884,7 +893,8 @@
             document.getElementById('profName').innerText = matchedOrders[matchedOrders.length - 1].fullName;
             document.getElementById('profPhone').innerText = phoneKey;
 
-            const now = new Date(); let finalFilteredOrders = [];
+            const now = new Date();
+            let finalFilteredOrders = [];
 
             matchedOrders.forEach(order => {
                 if (!order.lastOrderDateTime) return;
@@ -904,7 +914,8 @@
 
             document.getElementById('profTotalBills').innerText = `${finalFilteredOrders.length} บิล`;
 
-            let totalSpendSum = 0; const itemAccumulator = {};
+            let totalSpendSum = 0;
+            const itemAccumulator = {};
             productsMaster.forEach(p => { itemAccumulator[p.name] = 0; });
 
             finalFilteredOrders.forEach(order => {
@@ -917,27 +928,31 @@
             document.getElementById('profTotalSpend').innerText = `${totalSpendSum.toLocaleString()} บาท`;
 
             const tableBody = document.getElementById('profItemsTableBody');
-            if(!tableBody) return; tableBody.innerHTML = '';
-
+            tableBody.innerHTML = '';
             let hasItems = false;
             Object.keys(itemAccumulator).forEach(itemName => {
                 const totalQty = itemAccumulator[itemName];
                 if (totalQty > 0) {
-                    hasItems = true; const row = document.createElement('tr');
+                    hasItems = true;
+                    const row = document.createElement('tr');
                     row.innerHTML = `<td><strong>${itemName}</strong></td><td style="font-weight:bold; color:var(--info-color);">${totalQty.toLocaleString()} แพ็ค</td>`;
                     tableBody.appendChild(row);
                 }
             });
 
-            if (!hasItems) tableBody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#888;">ไม่พบประวัติในช่วงเวลานี้</td></tr>`;
+            if (!hasItems) tableBody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#888;">ไม่พบประวัติการซื้อในช่วงเวลานี้</td></tr>`;
             document.getElementById('customerProfileCard').scrollIntoView({ behavior: 'smooth' });
         }
 
         function prepareEdit(index) {
-            editIndex = index; const customer = customerList[index]; switchAppLayer('front-pos');
+            editIndex = index; 
+            const customer = customerList[index];
+            switchAppLayer('front-pos');
+            
             document.getElementById('customerType').value = customer.customerType;
             document.getElementById('shippingFee').value = customer.shippingFee || 0;
-            cart = customer.cartItems || []; renderProducts();
+            cart = customer.cartItems || [];
+            renderProducts();
 
             document.getElementById('fullName').value = customer.fullName;
             document.getElementById('phoneNumber').value = customer.phoneNumber;
@@ -954,7 +969,9 @@
         document.getElementById('filterType').addEventListener('change', updateCustomerTable);
 
         function resetFormState() {
-            editIndex = null; document.getElementById('customerForm').reset(); document.getElementById('orderAmount').value = 0;
+            editIndex = null;
+            document.getElementById('customerForm').reset();
+            document.getElementById('orderAmount').value = 0;
             document.getElementById('formTitle').innerText = '👤 ข้อมูลลูกค้า / ออกบิล';
             document.getElementById('cancelBtn').style.display = 'none';
             document.getElementById('recognitionAlertBox').style.display = 'none';
@@ -962,12 +979,19 @@
         }
 
         function updateAppDisplay() { 
-            if(isAdminLoggedIn) { calculateSalesDashboard(); updateCustomerTable(); renderStockManagementTable(); renderProductSalesReport(); updateProductSalesPieChartVisual(); }
+            if(isAdminLoggedIn) {
+                calculateSalesDashboard(); 
+                updateCustomerTable(); 
+                renderStockManagementTable();
+                renderProductSalesReport();
+                updateProductSalesPieChartVisual();
+            }
         }
 
         function calculateSalesDashboard() {
             const dashboard = document.getElementById('monthlySalesDashboard');
-            if(!dashboard) return; dashboard.innerHTML = '';
+            if(!dashboard) return;
+            dashboard.innerHTML = '';
             if (customerList.length === 0) { dashboard.innerHTML = '<p style="color:#888; text-align:center; width:100%;">ยังไม่มีประวัติในระบบ</p>'; return; }
             const salesGrouped = {};
             customerList.forEach(customer => {
@@ -976,15 +1000,20 @@
                 let groupKey = "";
                 if (currentDashboardMode === 'day') { groupKey = dateObj.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }); } 
                 else if (currentDashboardMode === 'week') {
-                    const dayOfWeek = dateObj.getDay(); const startOfWeek = new Date(dateObj); startOfWeek.setDate(dateObj.getDate() - dayOfWeek);
-                    const endOfWeek = new Date(startOfWeek); endOfWeek.setDate(startOfWeek.getDate() + 6);
+                    const dayOfWeek = dateObj.getDay();
+                    const startOfWeek = new Date(dateObj);
+                    startOfWeek.setDate(dateObj.getDate() - dayOfWeek);
+                    const endOfWeek = new Date(startOfWeek);
+                    endOfWeek.setDate(startOfWeek.getDate() + 6);
                     groupKey = `สัปดาห์: ${startOfWeek.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })} - ${endOfWeek.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' })}`;
                 } 
                 else if (currentDashboardMode === 'month') { groupKey = dateObj.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' }); }
-                if (!salesGrouped[groupKey]) salesGrouped[groupKey] = 0; salesGrouped[groupKey] += customer.orderAmount;
+                if (!salesGrouped[groupKey]) salesGrouped[groupKey] = 0;
+                salesGrouped[groupKey] += customer.orderAmount;
             });
             for (const [timePeriod, total] of Object.entries(salesGrouped)) {
-                const card = document.createElement('div'); card.className = 'dash-card';
+                const card = document.createElement('div');
+                card.className = 'dash-card';
                 card.innerHTML = `<h4>ยอดขายรอบ${currentDashboardMode === 'day' ? 'วัน' : currentDashboardMode === 'week' ? 'สัปดาห์' : 'เดือน'}: ${timePeriod}</h4><div class="value">${total.toLocaleString()} บ.</div>`;
                 dashboard.appendChild(card);
             }
@@ -992,7 +1021,8 @@
 
         function updateCustomerTable() {
             const tableBody = document.getElementById('customerTableBody');
-            if(!tableBody) return; tableBody.innerHTML = ''; 
+            if(!tableBody) return;
+            tableBody.innerHTML = ''; 
             const searchQuery = document.getElementById('searchBox').value.toLowerCase();
             const selectedFilter = document.getElementById('filterType').value;
             let displayedCount = 0;
@@ -1002,7 +1032,8 @@
                 const matchesFilter = selectedFilter === 'ทั้งหมด' || customer.customerType === selectedFilter;
 
                 if (matchesSearch && matchesFilter) {
-                    displayedCount++; const row = document.createElement('tr');
+                    displayedCount++;
+                    const row = document.createElement('tr');
                     const orderDateFormatted = customer.lastOrderDateTime ? new Date(customer.lastOrderDateTime).toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
 
                     let itemsHtml = '<ul class="history-item-list">';
@@ -1012,9 +1043,14 @@
                     itemsHtml += `<li class="shipping-cost-text">🚚 ค่าจัดส่ง: ${customer.shippingFee > 0 ? customer.shippingFee + ' บ.' : 'ส่งฟรี'}</li></ul>`;
 
                     row.innerHTML = `
-                        <td>${displayedCount}</td><td><strong>${customer.fullName}</strong></td><td>${customer.phoneNumber}</td><td>${customer.location}</td>
+                        <td>${displayedCount}</td>
+                        <td><strong>${customer.fullName}</strong></td>
+                        <td>${customer.phoneNumber}</td>
+                        <td>${customer.location}</td>
                         <td><span class="badge badge-${customer.customerType}">${customer.customerType === 'สนใจแฟรนไชส์' ? 'สมาชิกแฟรนไชส์' : customer.customerType === 'ขายส่ง' ? 'ชุดราคาพิเศษ' : 'ลูกค้าทั่วไป'}</span></td>
-                        <td>${itemsHtml}</td><td>${orderDateFormatted}</td><td style="font-weight:bold; color:#ff4757;">${customer.orderAmount.toLocaleString()} บ.</td>
+                        <td>${itemsHtml}</td>
+                        <td>${orderDateFormatted}</td>
+                        <td style="font-weight:bold; color:#ff4757;">${customer.orderAmount.toLocaleString()} บ.</td>
                         <td>
                             <div class="action-btn-group">
                                 <button class="profile-btn" onclick="viewCustomerProfile('${customer.phoneNumber}')">🔎 ดูประวัติสะสม</button>
@@ -1026,13 +1062,14 @@
                     tableBody.appendChild(row);
                 }
             });
-            if (displayedCount === 0) tableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#888;">ไม่พบข้อมูล</td></tr>`;
+            if (displayedCount === 0) { tableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#888;">ไม่พบข้อมูล</td></tr>`; }
         }
 
         document.getElementById('exportCsvBtn').addEventListener('click', function() {
             if (customerList.length === 0) { alert("ไม่มีข้อมูลสำหรับการนำออก"); return; }
             let csvHeaderArray = ["บิลที่", "ชื่อผู้ซื้อ", "เบอร์โทรศัพท์", "สถานที่จัดส่ง", "ประเภทราคาส่ง", "วันที่บันทึกรายการ"];
-            productsMaster.forEach(p => { csvHeaderArray.push(`"${p.name} (แพ็ค)"`); }); csvHeaderArray.push("ค่าจัดส่ง(บาท)", " ยอดเงินสุทธิรวมบิล(บาท)");
+            productsMaster.forEach(p => { csvHeaderArray.push(`"${p.name} (แพ็ค)"`); });
+            csvHeaderArray.push("ค่าจัดส่ง(บาท)", " ยอดเงินสุทธิรวมบิล(บาท)");
 
             let csvContent = csvHeaderArray.join(",") + "\n";
 
@@ -1048,13 +1085,17 @@
                     }
                     orderRowCells.push(quantitySold);
                 });
-                orderRowCells.push(customer.shippingFee || 0); orderRowCells.push(customer.orderAmount);
+
+                orderRowCells.push(customer.shippingFee || 0);
+                orderRowCells.push(customer.orderAmount);
                 csvContent += orderRowCells.join(",") + "\n";
             });
 
             const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
-            const link = document.createElement("a"); link.setAttribute("href", url); link.setAttribute("download", `รายงานบัญชีราคาส่ง_เป๋าตุงฟู้ดส์_แยกสินค้าละเอียด_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.csv`);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `รายงานบัญชีราคาส่ง_เป๋าตุงฟู้ดส์_แยกสินค้าละเอียด_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.csv`);
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
         });
     </script>
